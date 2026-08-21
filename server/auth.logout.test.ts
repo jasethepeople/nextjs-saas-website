@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
 import { COOKIE_NAME } from "../shared/const";
 import type { TrpcContext } from "./_core/context";
+import { LOCAL_SESSION_COOKIE } from "./auth";
 
 type CookieCall = {
   name: string;
@@ -19,6 +20,7 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
     email: "sample@example.com",
     name: "Sample User",
     loginMethod: "manus",
+    passwordHash: null,
     role: "user",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -49,13 +51,20 @@ describe("auth.logout", () => {
     const result = await caller.auth.logout();
 
     expect(result).toEqual({ success: true });
-    expect(clearedCookies).toHaveLength(1);
-    expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
-    expect(clearedCookies[0]?.options).toMatchObject({
+    expect(clearedCookies).toHaveLength(2);
+    expect(clearedCookies.map(cookie => cookie.name)).toEqual(expect.arrayContaining([COOKIE_NAME, LOCAL_SESSION_COOKIE]));
+    const platformCookie = clearedCookies.find(cookie => cookie.name === COOKIE_NAME);
+    expect(platformCookie?.options).toMatchObject({
       maxAge: -1,
       secure: true,
       sameSite: "none",
       httpOnly: true,
+      path: "/",
+    });
+    const localCookie = clearedCookies.find(cookie => cookie.name === LOCAL_SESSION_COOKIE);
+    expect(localCookie?.options).toMatchObject({
+      httpOnly: true,
+      sameSite: "lax",
       path: "/",
     });
   });

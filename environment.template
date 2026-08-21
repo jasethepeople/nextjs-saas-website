@@ -1,0 +1,15 @@
+# Copy this file to .env when self-hosting Northstar.
+NODE_ENV=development
+DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/northstar
+JWT_SECRET=replace-with-a-long-random-secret
+
+# Optional Google OAuth activation
+# Callback URL: http://localhost:3000/api/auth/google/callback
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Optional Stripe billing activation
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_STARTER_PRICE_ID=
+STRIPE_GROWTH_PRICE_ID=
